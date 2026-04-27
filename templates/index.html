@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DNA & RNA Sequence Analyzer</title>
+  <link rel="stylesheet" href="/static/css/style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+</head>
+<body>
+  <!-- ── Header ── -->
+  <header class="site-header">
+    <div class="header-inner">
+      <div class="logo">
+        <span class="logo-helix">🧬</span>
+        <div>
+          <span class="logo-title">SequenceAnalyzer</span>
+          <span class="logo-sub">CSC 442 · Computational Biology</span>
+        </div>
+      </div>
+      <nav class="header-nav">
+        <a href="#input-section">Input</a>
+        <a href="#results-section">Results</a>
+        <a href="#about">About</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- ── Hero ── -->
+  <section class="hero">
+    <div class="hero-content">
+      <h1>DNA & RNA <span class="gradient-text">Sequence Analyzer</span></h1>
+      <p class="hero-subtitle">From raw nucleotide sequence to characterised protein — step by step, explained in plain English.</p>
+      <div class="hero-badges">
+        <span class="badge">Transcription</span>
+        <span class="badge">Translation</span>
+        <span class="badge">Protein Lookup</span>
+      </div>
+    </div>
+    <div class="hero-art" aria-hidden="true">
+      <div class="dna-strand">
+        <div class="base-pair" style="--d:0s"><span>A</span><span>T</span></div>
+        <div class="base-pair" style="--d:.1s"><span>G</span><span>C</span></div>
+        <div class="base-pair" style="--d:.2s"><span>C</span><span>G</span></div>
+        <div class="base-pair" style="--d:.3s"><span>T</span><span>A</span></div>
+        <div class="base-pair" style="--d:.4s"><span>A</span><span>T</span></div>
+        <div class="base-pair" style="--d:.5s"><span>G</span><span>C</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Main ── -->
+  <main class="container">
+
+    <!-- INPUT SECTION -->
+    <section id="input-section" class="card">
+      <h2 class="section-title"><span class="step-num">1</span> Sequence Input</h2>
+      <p class="section-desc">Enter a DNA or RNA sequence by typing, pasting, uploading a file, or dragging &amp; dropping.</p>
+
+      <!-- Drag & Drop zone -->
+      <div id="drop-zone" class="drop-zone" role="region" aria-label="File drop zone">
+        <div class="drop-inner">
+          <span class="drop-icon">📂</span>
+          <p>Drag &amp; drop a <strong>.txt</strong> or <strong>.fasta</strong> file here</p>
+          <p class="drop-sub">or</p>
+          <label class="btn btn-outline" for="file-input">Browse File</label>
+          <input type="file" id="file-input" accept=".txt,.fasta,.fa,.seq" hidden />
+        </div>
+      </div>
+
+      <!-- Text area -->
+      <div class="textarea-wrap">
+        <label for="sequence-input" class="form-label">Or type / paste your sequence:</label>
+        <textarea id="sequence-input" class="sequence-textarea" rows="6"
+          placeholder="E.g.  ATGGCCATTGTAATGGGCCGCTGAAAGGGTGCCCGATAG  (DNA)&#10;     or  AUGGCCAUUGUAAUGGGCCGC  (RNA)"></textarea>
+        <div class="textarea-actions">
+          <button class="btn btn-ghost btn-sm" id="btn-clear">Clear</button>
+          <button class="btn btn-ghost btn-sm" id="btn-sample-dna">Sample DNA</button>
+          <button class="btn btn-ghost btn-sm" id="btn-sample-rna">Sample RNA</button>
+          <span id="seq-length" class="seq-length">0 bases</span>
+        </div>
+      </div>
+
+      <!-- Strand type -->
+      <div class="strand-choice" id="strand-choice-block">
+        <h3 class="choice-title">DNA Strand Type <span class="tag-optional">(DNA only)</span></h3>
+        <p class="choice-desc">Tell us which strand you're providing so transcription is performed correctly.</p>
+        <div class="radio-group">
+          <label class="radio-card active" id="label-non-template">
+            <input type="radio" name="strand" value="non_template" checked />
+            <span class="radio-icon">🔵</span>
+            <span class="radio-title">Non-template strand</span>
+            <span class="radio-sub">Also called the coding strand or sense strand (5'→3')</span>
+          </label>
+          <label class="radio-card" id="label-template">
+            <input type="radio" name="strand" value="template" />
+            <span class="radio-icon">🟠</span>
+            <span class="radio-title">Template strand</span>
+            <span class="radio-sub">Also called the antisense strand (3'→5')</span>
+          </label>
+        </div>
+      </div>
+
+      <button class="btn btn-primary btn-analyze" id="btn-analyze">
+        <span id="btn-analyze-text">🔬 Analyze Sequence</span>
+        <span id="btn-analyze-spinner" class="spinner" hidden></span>
+      </button>
+    </section>
+
+    <!-- RESULTS -->
+    <section id="results-section" hidden>
+
+      <!-- Detection -->
+      <div class="result-card" id="card-detection">
+        <div class="result-header">
+          <span class="result-step">Step 1</span>
+          <h2 class="result-title">Sequence Detection</h2>
+        </div>
+        <div id="detection-content"></div>
+      </div>
+
+      <!-- Transcription -->
+      <div class="result-card" id="card-transcription" hidden>
+        <div class="result-header">
+          <span class="result-step">Step 2</span>
+          <h2 class="result-title">Transcription</h2>
+        </div>
+        <div id="transcription-content"></div>
+      </div>
+
+      <!-- Translation -->
+      <div class="result-card" id="card-translation" hidden>
+        <div class="result-header">
+          <span class="result-step">Step 3</span>
+          <h2 class="result-title">Translation</h2>
+        </div>
+        <div id="translation-content"></div>
+      </div>
+
+      <!-- Amino Acids -->
+      <div class="result-card" id="card-amino" hidden>
+        <div class="result-header">
+          <span class="result-step">Step 4</span>
+          <h2 class="result-title">Amino Acids &amp; Polypeptide Chain</h2>
+        </div>
+        <div id="amino-content"></div>
+      </div>
+
+      <!-- Protein -->
+      <div class="result-card" id="card-protein" hidden>
+        <div class="result-header">
+          <span class="result-step">Step 5</span>
+          <h2 class="result-title">Protein &amp; Database Lookup</h2>
+        </div>
+        <div id="protein-content"></div>
+      </div>
+
+    </section>
+
+    <!-- ABOUT -->
+    <section id="about" class="card about-card">
+      <h2 class="section-title">About This Application</h2>
+      <p>This tool walks you through the <strong>central dogma of molecular biology</strong>: the fundamental process by which genetic information flows from DNA → RNA → Protein inside every living cell.</p>
+      <div class="about-steps">
+        <div class="about-step"><span class="about-icon">🧬</span><strong>DNA</strong> is the master blueprint stored in the nucleus.</div>
+        <div class="about-arrow">→</div>
+        <div class="about-step"><span class="about-icon">📜</span><strong>mRNA</strong> is a temporary copy made during transcription.</div>
+        <div class="about-arrow">→</div>
+        <div class="about-step"><span class="about-icon">🔗</span><strong>Protein</strong> is built from amino acids during translation.</div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="site-footer">
+    <p>CSC 442 — Computational Biology &amp; Interdisciplinary Studies · Department of Computer Science</p>
+  </footer>
+
+  <script src="/static/js/main.js"></script>
+</body>
+</html>
